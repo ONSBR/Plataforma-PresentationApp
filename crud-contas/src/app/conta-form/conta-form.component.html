@@ -1,0 +1,52 @@
+<div class="container">
+  <h1>Cadastro de contas</h1>
+  <form #f="ngForm" (ngSubmit)="onSubmit(f.value)">
+
+    <div class="form-group">
+      <label for="titular">Titular</label>
+      <input type="text" class="form-control" id="titular" 
+          required [(ngModel)]="model.titular" name="titular">
+    </div>
+
+    <div class="form-group">
+      <label for="saldo">Saldo</label>
+      <input type="saldo" class="form-control" id="saldo" 
+          required [(ngModel)]="model.saldo" name="saldo">
+    </div>
+
+    <button type="submit" class="btn btn-default">Salvar conta</button>
+
+    <h1>Lista de contas</h1>
+    <ul>
+      <li *ngFor="let conta of contas">
+        Titular: {{ conta.titular }} Saldo: {{ conta.saldo }}
+      </li>
+    </ul>
+
+    <h1>Transferência</h1>
+    <div class="form-group">
+      <label for="contaOrigem">Conta origem</label>
+      <select [(ngModel)]="contaOrigem" name="contaOrigem">
+        <option *ngFor="let conta of contas" [value]="conta.id">
+            {{ conta.id }}-{{ conta.titular }}
+        </option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label for="contaDestino">Conta destino</label>
+      <select [(ngModel)]="contaDestino" name="contaDestino">
+        <option *ngFor="let conta of contas" [value]="conta.id">
+            {{ conta.id }}-{{ conta.titular }}
+        </option>
+      </select>
+    </div>
+    <div class="form-group">
+        <label for="valorDaTransferencia">Valor da Transferência</label>
+        <input type="valorDaTransferencia" class="form-control" id="valorDaTransferencia" 
+            required [(ngModel)]="valorDaTransferencia" name="valorDaTransferencia">
+    </div>
+    
+    <button (click)="transferir($event)" class="btn btn-default">Transferir</button>
+
+  </form>
+</div>
