@@ -48,5 +48,12 @@
     
     <button (click)="transferir($event)" class="btn btn-default">Transferir</button>
 
+    <h1>Lista de Operações</h1>
+    <ul>
+      <li *ngFor="let operacao of operacoes">
+        Transferência: De {{ getConta(operacao.idContaOrigem).titular }} para {{ getConta(operacao.idContaDestino).titular }}, Valor: {{ operacao.valorTransferencia }}
+      </li>
+    </ul>
+
   </form>
 </div>

@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 
-import { Conta } from '../Conta.model';
+import { Conta, Operacao } from '../Conta.model';
 
 @Component({
   selector: 'conta-form',
@@ -9,16 +9,23 @@ import { Conta } from '../Conta.model';
 })
 
 export class ContaFormComponent implements OnInit {
+    
     contas: Conta[] = [];
     model = new Conta(0, "", 0);
     valorDaTransferencia: number;
     contaOrigem: number;
     contaDestino: number;
 
+    operacoes: Operacao[] = [];
+
     constructor() {
     }
 
     ngOnInit() {
+  }
+
+  getConta(idConta): Conta {
+    return this.contas[idConta];
   }
 
   onSubmit(form: Conta): void {  
@@ -28,8 +35,18 @@ export class ContaFormComponent implements OnInit {
 
   transferir(event): void {  
     event.preventDefault();
-    this.contas[this.contaOrigem].saldo = this.contas[this.contaOrigem].saldo - this.valorDaTransferencia;
-    this.contas[this.contaDestino].saldo = this.contas[this.contaDestino].saldo + Number(this.valorDaTransferencia);
+
+    var operacao = new Operacao(
+      this.operacoes.length,
+      this.contaOrigem, 
+      this.contaDestino, 
+      Number(this.valorDaTransferencia)
+    );
+
+    this.contas[operacao.idContaOrigem].saldo = this.contas[operacao.idContaOrigem].saldo - operacao.valorTransferencia;
+    this.contas[operacao.idContaDestino].saldo = this.contas[operacao.idContaDestino].saldo + operacao.valorTransferencia;
+
+    this.operacoes.push(operacao);
   }
 
 }
