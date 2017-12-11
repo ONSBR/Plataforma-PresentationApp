@@ -1,4 +1,6 @@
 # Para rodar a aplicação
-cd crud-contas/
+cd crud-contas/ 
+
 npm install 
-ng serve -o
+
+ng serve -o 
