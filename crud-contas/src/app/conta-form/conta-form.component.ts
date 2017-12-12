@@ -1,4 +1,5 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, Inject } from '@angular/core';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 
 import { Conta, Operacao } from '../Conta.model';
 
@@ -18,7 +19,7 @@ export class ContaFormComponent implements OnInit {
 
     operacoes: Operacao[] = [];
 
-    constructor() {
+    constructor(private http: HttpClient) {
     }
 
     ngOnInit() {
@@ -29,7 +30,16 @@ export class ContaFormComponent implements OnInit {
   }
 
   onSubmit(form: Conta): void {  
-    this.contas.push(new Conta(this.contas.length, form.titular, Number(form.saldo)));
+
+    var conta = new Conta(this.contas.length, form.titular, Number(form.saldo));
+    
+    var url = "http://localhost:8083/account";
+
+    this.http.put(url, conta, {responseType: "json", withCredentials:false}).subscribe(data => {
+      this.contas.push(<Conta>data);
+      console.log(data);
+    });
+
     console.log(this.contas);
   }
 
