@@ -1,6 +1,7 @@
 var config = require('./config');
 var eventHelper = require("../../Plataforma-SDK/EventHelper");
 var Evento = require("../../Plataforma-core/Evento");
+var EventCatalog = require("../../Plataforma-ProcessApp/conta-process-app/metadados/EventCatalog");
 
 
 // Dependencies
@@ -47,7 +48,8 @@ app.put("/account", function(req, res) {
   console.log("___ENTER PUT CONTA___");
 
   var evento = new Evento();
-  evento.name = "account.add";
+  evento.processName = "CadastraConta";
+  evento.name = EventCatalog.account_put;
   evento.payload = req.body;
 
   eventHelper.sendEvent(evento);
