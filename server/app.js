@@ -1,7 +1,7 @@
 var config = require('./config');
-var eventHelper = require("../../Plataforma-SDK/EventHelper");
-var Evento = require("../../Plataforma-core/Evento");
-var EventCatalog = require("../../Plataforma-ProcessApp/conta-process-app/metadados/EventCatalog");
+var eventHelper = require("plataforma-sdk/EventHelper");
+var Evento = require("plataforma-core/Evento");
+var EventCatalog = require("plataforma-processapp/conta-process-app/metadados/EventCatalog");
 
 
 // Dependencies
