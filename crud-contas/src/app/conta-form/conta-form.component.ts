@@ -28,7 +28,7 @@ export class ContaFormComponent implements OnInit {
 
       var self = this;
       setInterval(() => { 
-        var urlEvt = "http://localhost:8080/event?presentationId=" + self.presentationId;
+        var urlEvt = "http://localhost:8086/event?presentationId=" + self.presentationId;
         
         self.http.get(urlEvt, {responseType: "json", withCredentials:false}).subscribe(data => {
           
