@@ -51,7 +51,7 @@ app.put("/account", function(req, res) {
   var account = req.body.conta;
 
   var evento = new Evento();
-  evento.processName = "CadastraConta";
+  evento.processName = "cadastra-conta";
   evento.name = EventCatalog.account_put;
   evento.payload = account;
   evento.origem = presentationId;
