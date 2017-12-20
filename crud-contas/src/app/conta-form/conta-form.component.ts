@@ -66,7 +66,7 @@ export class ContaFormComponent implements OnInit {
 
     this.http.put(url, { presentationId: presentationId, conta: conta }, {responseType: "json", withCredentials:false}).subscribe(data => {
       
-      console.log("url: " + url + ", res: " + +data);
+      console.log("url: " + url + ", res: " + data);
     });
 
     console.log(this.contas);
