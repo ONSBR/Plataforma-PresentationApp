@@ -11,6 +11,7 @@
   "dependencies": {
     "plataforma-sdk": "git+https://github.com/ONSBR/Plataforma-SDK",
     "plataforma-core": "git+https://github.com/ONSBR/Plataforma-core",
+    "plataforma-processapp": "git+https://github.com/ONSBR/Plataforma-ProcessApp",
     "body-parser": "^1.18.2",
     "express": "^4.16.2",
     "forever": "^0.15.3",
