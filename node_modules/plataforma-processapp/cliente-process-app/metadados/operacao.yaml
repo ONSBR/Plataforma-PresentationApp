@@ -1,0 +1,8 @@
+operacao: 
+  - operacoes: 
+      nome: cadastra-cliente
+      caminhoDoArquivo: cadastra-cliente.js
+      metodo: cadastraCliente 
+      eventos-entrada:
+        -client.put
+      eventos-saida:

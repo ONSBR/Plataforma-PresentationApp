@@ -1,0 +1,6 @@
+Conta:
+  fields:
+    saldo:
+      from: saldo
+    titular:
+      from: titular

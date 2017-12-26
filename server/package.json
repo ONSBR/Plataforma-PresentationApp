@@ -9,12 +9,12 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "plataforma-sdk": "git+https://github.com/ONSBR/Plataforma-SDK",
-    "plataforma-core": "git+https://github.com/ONSBR/Plataforma-core",
-    "plataforma-processapp": "git+https://github.com/ONSBR/Plataforma-ProcessApp",
     "body-parser": "^1.18.2",
     "express": "^4.16.2",
     "forever": "^0.15.3",
-    "node-rest-client": "^3.1.0"
+    "node-rest-client": "^3.1.0",
+    "plataforma-core": "file:../../plataforma-core",
+    "plataforma-processapp": "file:../../plataforma-processapp",
+    "plataforma-sdk": "file:../../Plataforma-SDK"
   }
 }

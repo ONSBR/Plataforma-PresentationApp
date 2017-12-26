@@ -1,3 +1,5 @@
 export const environment = {
-  production: true
+  production: true,
+  urlEventManager: "http://localhost:8086/event?presentationId=",
+  urlServerPresentation: "http://localhost:8083/"
 };

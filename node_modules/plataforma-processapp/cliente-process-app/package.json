@@ -1,0 +1,11 @@
+{
+  "name": "cliente-process-app",
+  "version": "0.0.1",
+  "description": "cliente process app",
+  "main": "app.js",
+  "scripts": {
+    "test": "test"
+  },
+  "author": "",
+  "license": "ISC"
+}

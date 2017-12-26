@@ -1,0 +1,8 @@
+Cliente:
+  fields:
+    id:
+      from: id
+    nome:
+      from: nome
+    sobrenome:
+      from: sobrenome

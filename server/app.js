@@ -62,6 +62,26 @@ app.put("/account", function(req, res) {
 });
 
 
+app.put("/transfer", function(req, res) {
+  
+    console.log("___ENTER PUT TRANSFERENCIA___" + req.body.presentationId); 
+  
+    var presentationId = req.body.presentationId;
+  
+    var evento = new Evento();
+    evento.processName = "transferencia-conta";
+    evento.name = EventCatalog.transfer_request;
+    evento.payload = req.body;
+    evento.origem = presentationId;
+  
+    console.log("___EVENTO___" + EventCatalog.transfer_request); 
+
+    eventHelper.sendEvent(evento);
+  
+    res.send("OK");
+  });
+  
+
 // Listener
 // ===========================================================
 app.listen(PORT, function() {

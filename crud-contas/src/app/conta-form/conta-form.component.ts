@@ -2,6 +2,7 @@ import { Component, OnInit, Inject } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 
 import { Conta, Operacao } from '../Conta.model';
+import { environment } from '../../environments/environment.prod';
 
 @Component({
   selector: 'conta-form',
@@ -26,9 +27,10 @@ export class ContaFormComponent implements OnInit {
 
   ngOnInit() {
 
+      //TODO Pooling para realizar o papel do websocket, para receber mensagem para o client.
       var self = this;
       setInterval(() => { 
-        var urlEvt = "http://localhost:8086/event?presentationId=" + self.presentationId;
+        var urlEvt = environment.urlEventManager + self.presentationId;
         
         self.http.get(urlEvt, {responseType: "json", withCredentials:false}).subscribe(data => {
           
@@ -45,10 +47,20 @@ export class ContaFormComponent implements OnInit {
 
   }
 
+  // TODO: Verifica se o evento é esperado pela camada de apresentação.
   doneEvent(evt) {
+    
     if(evt.name == "account.saved") {
       alert("Conta Confirmada!");
       this.contas.push(evt.payload);
+    }
+    else if(evt.name == "transfer.confirmation") {
+            
+      this.contas[evt.payload.contaOrigem.id] = evt.payload.contaOrigem;
+      this.contas[evt.payload.contaDestino.id] = evt.payload.contaDestino;
+      this.operacoes.push(evt.payload.operacao);
+      
+      alert("Transferência realizada com sucesso!");
     }
   }
 
@@ -62,7 +74,7 @@ export class ContaFormComponent implements OnInit {
     
     var presentationId = this.presentationId;
 
-    var url = "http://localhost:8083/account";
+    var url = environment.urlServerPresentation + "account";
 
     this.http.put(url, { presentationId: presentationId, conta: conta }, {responseType: "json", withCredentials:false}).subscribe(data => {
       
@@ -82,10 +94,24 @@ export class ContaFormComponent implements OnInit {
       Number(this.valorDaTransferencia)
     );
 
-    this.contas[operacao.idContaOrigem].saldo = this.contas[operacao.idContaOrigem].saldo - operacao.valorTransferencia;
-    this.contas[operacao.idContaDestino].saldo = this.contas[operacao.idContaDestino].saldo + operacao.valorTransferencia;
+    var contaOrigem = this.contas[operacao.idContaOrigem];
+    var contaDestino = this.contas[operacao.idContaDestino];
 
-    this.operacoes.push(operacao);
+    // TODO: local Source 
+    //contaOrigem.saldo = contaOrigem.saldo - operacao.valorTransferencia;
+    //contaDestino.saldo = contaDestino.saldo + operacao.valorTransferencia;
+    //this.operacoes.push(operacao);
+
+    var url = environment.urlServerPresentation + "transfer";
+
+    var presentationId = this.presentationId;    
+
+    this.http.put(url, { presentationId: presentationId, contaOrigem: contaOrigem, contaDestino: contaDestino, operacao: operacao }, 
+      {responseType: "json", withCredentials:false}).subscribe(data => {
+      
+      console.log("url: " + url + ", res: " + data);
+    });
+
   }
 
 }
