@@ -1,6 +1,6 @@
 Conta:
   fields:
-    saldo:
+    clienteOrigem:
       from: saldo
-    titular:
+    clienteDestino:
       from: titular
