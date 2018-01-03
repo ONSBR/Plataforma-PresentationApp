@@ -19,7 +19,7 @@
     <h1>Lista de contas</h1>
     <ul>
       <li *ngFor="let conta of contas">
-        Titular: {{ conta.titular }} Saldo: {{ conta.saldo }}
+        Titular: {{ conta.titular }} Saldo: {{ conta.saldo }} <input type="button" value="Reproduzir" (click)="reproduzir(conta.instanciaOriginal)"/>
       </li>
     </ul>
 

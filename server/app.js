@@ -80,7 +80,23 @@ app.put("/transfer", function(req, res) {
   
     res.send("OK");
   });
+
+  app.put("/reproductionconta", function(req, res) {
+    
+    console.log("___ENTER PUT REPRODUCTION___" + req.body.instanciaOriginal); 
   
+    var presentationId = req.body.presentationId;
+  
+    var evento = new Evento();
+    evento.name = "system.event.reproduction";
+    evento.payload = req.body;
+    evento.origem = presentationId;
+  
+    eventHelper.sendEvent(evento);
+  
+    res.send("OK");
+  });
+
 
 // Listener
 // ===========================================================

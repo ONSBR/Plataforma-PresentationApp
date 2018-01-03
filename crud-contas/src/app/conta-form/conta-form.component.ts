@@ -51,8 +51,14 @@ export class ContaFormComponent implements OnInit {
   doneEvent(evt) {
     
     if(evt.name == "account.saved") {
-      alert("Conta Confirmada!");
-      this.contas.push(evt.payload);
+
+      if (evt.reproducao) {
+        alert("Reprocessamento do cadastro da conta realizado!");
+      } else {
+        alert("Conta Confirmada!");
+        evt.payload.instanciaOriginal = evt.instancia;
+        this.contas.push(evt.payload);
+      }
     }
     else if(evt.name == "transfer.confirmation") {
             
@@ -62,6 +68,15 @@ export class ContaFormComponent implements OnInit {
       
       alert("Transferência realizada com sucesso!");
     }
+  }
+
+  reproduzir(instanciaOriginal) {
+
+    var url = environment.urlServerPresentation + "reproductionconta";
+
+    this.http.put(url, { instanciaOriginal: instanciaOriginal }, {responseType: "json", withCredentials:false}).subscribe(data => {
+      console.log("url: " + url + ", res: " + data);
+    });
   }
 
   getConta(idConta): Conta {
@@ -96,11 +111,6 @@ export class ContaFormComponent implements OnInit {
 
     var contaOrigem = this.contas[operacao.idContaOrigem];
     var contaDestino = this.contas[operacao.idContaDestino];
-
-    // TODO: local Source 
-    //contaOrigem.saldo = contaOrigem.saldo - operacao.valorTransferencia;
-    //contaDestino.saldo = contaDestino.saldo + operacao.valorTransferencia;
-    //this.operacoes.push(operacao);
 
     var url = environment.urlServerPresentation + "transfer";
 
