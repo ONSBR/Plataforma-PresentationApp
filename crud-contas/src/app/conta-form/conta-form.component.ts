@@ -2,6 +2,7 @@ import { Component, OnInit, Inject } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 
 import { Conta, Operacao } from '../Conta.model';
+import { Cliente } from '../Cliente.model';
 import { environment } from '../../environments/environment.prod';
 
 @Component({
@@ -86,13 +87,13 @@ export class ContaFormComponent implements OnInit {
   onSubmit(form: Conta): void {  
 
     var conta = new Conta(this.contas.length, form.titular, Number(form.saldo));
-    
+
     var presentationId = this.presentationId;
 
     var url = environment.urlServerPresentation + "account";
 
     this.http.put(url, { presentationId: presentationId, conta: conta }, {responseType: "json", withCredentials:false}).subscribe(data => {
-      
+
       console.log("url: " + url + ", res: " + data);
     });
 
@@ -122,6 +123,18 @@ export class ContaFormComponent implements OnInit {
       console.log("url: " + url + ", res: " + data);
     });
 
+  }
+
+  salvarCliente(titular): void {
+    event.preventDefault();
+    const cliente = new Cliente(this.contas.length, titular);
+    const presentationId = this.presentationId;
+    const url = environment.urlServerPresentation + 'client';
+
+    this.http.put(url, { presentationId: presentationId, cliente: cliente },
+      {responseType: 'json', withCredentials: false}).subscribe(data => {
+      console.log('url: ' + url + ', res: ' + data);
+    });
   }
 
 }

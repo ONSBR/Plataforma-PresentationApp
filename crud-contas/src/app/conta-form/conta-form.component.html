@@ -8,6 +8,8 @@
           required [(ngModel)]="model.titular" name="titular">
     </div>
 
+    <button (click)="salvarCliente(model.titular)" class="btn btn-default">Salvar Cliente</button>
+
     <div class="form-group">
       <label for="saldo">Saldo</label>
       <input type="saldo" class="form-control" id="saldo" 
