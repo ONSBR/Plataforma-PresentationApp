@@ -12,11 +12,11 @@ import { environment } from '../../environments/environment.prod';
 })
 
 export class ContaFormComponent implements OnInit {
-  
+
   private presentationId: string = Guid.newGuid();
 
   contas: Conta[] = [];
-  model = new Conta(0, "", 0);
+  model = new Conta(0, '', 0);
   valorDaTransferencia: number;
   contaOrigem: number;
   contaDestino: number;
@@ -28,19 +28,17 @@ export class ContaFormComponent implements OnInit {
 
   ngOnInit() {
 
-      //TODO Pooling para realizar o papel do websocket, para receber mensagem para o client.
-      var self = this;
-      setInterval(() => { 
-        var urlEvt = environment.urlEventManager + self.presentationId;
-        
-        self.http.get(urlEvt, {responseType: "json", withCredentials:false}).subscribe(data => {
-          
-          var listaEventos: any = data;
+      // TODO Pooling para realizar o papel do websocket, para receber mensagem para o client.
+      const self = this;
+      setInterval(() => {
+        const urlEvt = environment.urlEventManager + self.presentationId;
+        self.http.get(urlEvt, {responseType: 'json', withCredentials: false}).subscribe(data => {
+
+          const listaEventos: any = data;
           if (listaEventos && listaEventos.length > 0) {
-            
-            for(var i=0; i<listaEventos.length; i++){
-              var evt = listaEventos[i];
-              self.doneEvent(evt);
+            for (let i = 0; i < listaEventos.length; i++) {
+              const evt = listaEventos[i];
+              self.eventDone(evt);
             }
           }
         });
@@ -49,34 +47,29 @@ export class ContaFormComponent implements OnInit {
   }
 
   // TODO: Verifica se o evento é esperado pela camada de apresentação.
-  doneEvent(evt) {
-    
-    if(evt.name == "account.saved") {
-
+  eventDone(evt) {
+    if (evt.name === 'account.saved') {
       if (evt.reproducao) {
-        alert("Reprocessamento do cadastro da conta realizado!");
+        alert('Reprocessamento do cadastro da conta realizado!');
       } else {
-        alert("Conta Confirmada!");
+        alert('Conta Confirmada!');
         evt.payload.instanciaOriginal = evt.instancia;
         this.contas.push(evt.payload);
       }
-    }
-    else if(evt.name == "transfer.confirmation") {
-            
+    } else if (evt.name === 'transfer.confirmation') {
       this.contas[evt.payload.contaOrigem.id] = evt.payload.contaOrigem;
       this.contas[evt.payload.contaDestino.id] = evt.payload.contaDestino;
       this.operacoes.push(evt.payload.operacao);
-      
-      alert("Transferência realizada com sucesso!");
+      alert('Transferência realizada com sucesso!');
+    } else if (evt.name === 'client.saved') {
+      alert('Cliente cadastrado com sucesso!');
     }
   }
 
   reproduzir(instanciaOriginal) {
-
-    var url = environment.urlServerPresentation + "reproductionconta";
-
+    const url = environment.urlServerPresentation + 'reproductionconta';
     this.http.put(url, { instanciaOriginal: instanciaOriginal }, {responseType: "json", withCredentials:false}).subscribe(data => {
-      console.log("url: " + url + ", res: " + data);
+      console.log('url: ' + url + ', res: ' + data);
     });
   }
 
@@ -84,7 +77,7 @@ export class ContaFormComponent implements OnInit {
     return this.contas[idConta];
   }
 
-  onSubmit(form: Conta): void {  
+  onSubmit(form: Conta): void {
 
     var conta = new Conta(this.contas.length, form.titular, Number(form.saldo));
 
@@ -94,19 +87,19 @@ export class ContaFormComponent implements OnInit {
 
     this.http.put(url, { presentationId: presentationId, conta: conta }, {responseType: "json", withCredentials:false}).subscribe(data => {
 
-      console.log("url: " + url + ", res: " + data);
+      console.log('url: ' + url + ', res: ' + data);
     });
 
     console.log(this.contas);
   }
 
-  transferir(event): void {  
+  transferir(event): void {
     event.preventDefault();
 
-    var operacao = new Operacao(
+    const operacao = new Operacao(
       this.operacoes.length,
-      this.contaOrigem, 
-      this.contaDestino, 
+      this.contaOrigem,
+      this.contaDestino,
       Number(this.valorDaTransferencia)
     );
 
