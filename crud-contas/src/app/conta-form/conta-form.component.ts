@@ -54,7 +54,7 @@ export class ContaFormComponent implements OnInit {
       if (evt.reproducao) {
         alert('Reprocessamento do cadastro da conta realizado!');
       } else {
-        alert('Conta Confirmada!' + evt.payload.instanciaOriginal);
+        alert('Conta Confirmada!');
         evt.payload.instanciaOriginal = evt.instancia;
         this.consultaListaCompletaDeContas();
       }
