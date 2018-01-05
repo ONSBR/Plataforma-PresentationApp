@@ -8,8 +8,6 @@
           required [(ngModel)]="model.titular" name="titular">
     </div>
 
-    <button (click)="salvarCliente(model.titular)" class="btn btn-default">Salvar Cliente</button>
-
     <div class="form-group">
       <label for="saldo">Saldo</label>
       <input type="saldo" class="form-control" id="saldo" 
@@ -29,16 +27,16 @@
     <div class="form-group">
       <label for="contaOrigem">Conta origem</label>
       <select [(ngModel)]="contaOrigem" name="contaOrigem">
-        <option *ngFor="let conta of contas" [value]="conta.id">
-            {{ conta.id }}-{{ conta.titular }}
+        <option *ngFor="let conta of contas" [ngValue]="conta">
+            {{ conta.titular }}
         </option>
       </select>
     </div>
     <div class="form-group">
       <label for="contaDestino">Conta destino</label>
       <select [(ngModel)]="contaDestino" name="contaDestino">
-        <option *ngFor="let conta of contas" [value]="conta.id">
-            {{ conta.id }}-{{ conta.titular }}
+        <option *ngFor="let conta of contas" [ngValue]="conta">
+            {{ conta.titular }} 
         </option>
       </select>
     </div>
@@ -53,7 +51,7 @@
     <h1>Lista de Operações</h1>
     <ul>
       <li *ngFor="let operacao of operacoes">
-        Transferência: De {{ getConta(operacao.idContaOrigem).titular }} para {{ getConta(operacao.idContaDestino).titular }}, Valor: {{ operacao.valorTransferencia }}
+        <Transferência: De {{ operacao.contaOrigem }} para {{ operacao.contaDestino}}, Valor: {{ operacao.valorTransferencia }}>
       </li>
     </ul>
 

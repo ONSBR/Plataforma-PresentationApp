@@ -1,6 +1,5 @@
 import { Component, OnInit, Inject } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
-
 import { Conta, Operacao } from '../Conta.model';
 import { Cliente } from '../Cliente.model';
 import { environment } from '../../environments/environment.prod';
@@ -16,14 +15,17 @@ export class ContaFormComponent implements OnInit {
   private presentationId: string = Guid.newGuid();
 
   contas: Conta[] = [];
+  clientes: Cliente[] = [];
   model = new Conta(0, '', 0);
   valorDaTransferencia: number;
-  contaOrigem: number;
-  contaDestino: number;
+  contaOrigem: Conta;
+  contaDestino: Conta;
 
   operacoes: Operacao[] = [];
 
   constructor(private http: HttpClient) {
+    this.consultaListaCompletaDeContas();
+    this.consultaListaCompletaDeTransferencias();
   }
 
   ngOnInit() {
@@ -52,40 +54,47 @@ export class ContaFormComponent implements OnInit {
       if (evt.reproducao) {
         alert('Reprocessamento do cadastro da conta realizado!');
       } else {
-        alert('Conta Confirmada!');
+        alert('Conta Confirmada!' + evt.payload.instanciaOriginal);
         evt.payload.instanciaOriginal = evt.instancia;
-        this.contas.push(evt.payload);
+        this.consultaListaCompletaDeContas();
       }
     } else if (evt.name === 'transfer.confirmation') {
-      this.contas[evt.payload.contaOrigem.id] = evt.payload.contaOrigem;
-      this.contas[evt.payload.contaDestino.id] = evt.payload.contaDestino;
-      this.operacoes.push(evt.payload.operacao);
+      this.consultaListaCompletaDeContas();
+      this.consultaListaCompletaDeTransferencias();
       alert('Transferência realizada com sucesso!');
-    } else if (evt.name === 'client.saved') {
-      alert('Cliente cadastrado com sucesso!');
     }
+  }
+
+  consultaListaCompletaDeContas() {
+    const headers = new HttpHeaders().set('Instance-Id', this.presentationId);
+    this.http.get('http://localhost:9090/presentation-conta/conta', {headers}).subscribe(data => {
+      this.contas = <Conta[]> data;
+    });
+  }
+
+  consultaListaCompletaDeTransferencias() {
+    const headers = new HttpHeaders().set('Instance-Id', this.presentationId);
+    this.http.get('http://localhost:9090/presentation-conta/transferencia', {headers}).subscribe(data => {
+      this.operacoes = <Operacao[]> data;
+    });
   }
 
   reproduzir(instanciaOriginal) {
     const url = environment.urlServerPresentation + 'reproductionconta';
-    this.http.put(url, { instanciaOriginal: instanciaOriginal }, {responseType: "json", withCredentials:false}).subscribe(data => {
+    this.http.put(url, { instanciaOriginal: instanciaOriginal }, {responseType: 'json', withCredentials: false}).subscribe(data => {
       console.log('url: ' + url + ', res: ' + data);
     });
   }
 
-  getConta(idConta): Conta {
-    return this.contas[idConta];
-  }
-
   onSubmit(form: Conta): void {
 
-    var conta = new Conta(this.contas.length, form.titular, Number(form.saldo));
+    const conta = new Conta(this.contas.length, form.titular, Number(form.saldo));
 
-    var presentationId = this.presentationId;
+    const presentationId = this.presentationId;
 
-    var url = environment.urlServerPresentation + "account";
+    const url = environment.urlServerPresentation + 'account';
 
-    this.http.put(url, { presentationId: presentationId, conta: conta }, {responseType: "json", withCredentials:false}).subscribe(data => {
+    this.http.put(url, { presentationId: presentationId, conta: conta }, {responseType: 'json', withCredentials: false}).subscribe(data => {
 
       console.log('url: ' + url + ', res: ' + data);
     });
@@ -96,6 +105,8 @@ export class ContaFormComponent implements OnInit {
   transferir(event): void {
     event.preventDefault();
 
+    console.log(this.contaOrigem.id);
+
     const operacao = new Operacao(
       this.operacoes.length,
       this.contaOrigem,
@@ -103,31 +114,15 @@ export class ContaFormComponent implements OnInit {
       Number(this.valorDaTransferencia)
     );
 
-    var contaOrigem = this.contas[operacao.idContaOrigem];
-    var contaDestino = this.contas[operacao.idContaDestino];
+    const url = environment.urlServerPresentation + 'transfer';
 
-    var url = environment.urlServerPresentation + "transfer";
-
-    var presentationId = this.presentationId;    
-
-    this.http.put(url, { presentationId: presentationId, contaOrigem: contaOrigem, contaDestino: contaDestino, operacao: operacao }, 
-      {responseType: "json", withCredentials:false}).subscribe(data => {
-      
-      console.log("url: " + url + ", res: " + data);
-    });
-
-  }
-
-  salvarCliente(titular): void {
-    event.preventDefault();
-    const cliente = new Cliente(this.contas.length, titular);
     const presentationId = this.presentationId;
-    const url = environment.urlServerPresentation + 'client';
 
-    this.http.put(url, { presentationId: presentationId, cliente: cliente },
-      {responseType: 'json', withCredentials: false}).subscribe(data => {
+    this.http.put(url, { presentationId: presentationId, operacao: operacao },
+          {responseType: 'json', withCredentials: false}).subscribe(data => {
       console.log('url: ' + url + ', res: ' + data);
     });
+
   }
 
 }

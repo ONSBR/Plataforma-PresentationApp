@@ -9,8 +9,8 @@ export class Conta {
 export class Operacao {
   constructor(
     public id: number,
-    public idContaOrigem: number,
-    public idContaDestino: number,
+    public contaOrigem: Conta,
+    public contaDestino: Conta,
     public valorTransferencia: number
   ) { }
 }
