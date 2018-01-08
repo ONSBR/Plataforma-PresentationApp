@@ -15,7 +15,7 @@ export class TransferenciaFormComponent implements OnInit {
   private presentationId: string = Guid.newGuid();
 
   contas: Conta[] = [];
-  model = new Conta(0, "", 0);
+  model = new Conta(0, '', 0, null);
   valorDaTransferencia: number;
   contaOrigem: string;
   contaDestino: string;
@@ -61,7 +61,7 @@ export class TransferenciaFormComponent implements OnInit {
 
   onSubmit(form: Conta): void {  
 
-    var conta = new Conta(this.contas.length, form.titular, Number(form.saldo));
+    var conta = new Conta(this.contas.length, form.titular, Number(form.saldo), null);
     
     var presentationId = this.presentationId;
 

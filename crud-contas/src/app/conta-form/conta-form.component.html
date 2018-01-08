@@ -19,7 +19,7 @@
     <h1>Lista de contas</h1>
     <ul>
       <li *ngFor="let conta of contas">
-        Titular: {{ conta.titular }} Saldo: {{ conta.saldo }} <input type="button" value="Reproduzir" (click)="reproduzir(conta.instanciaOriginal)"/>
+        Titular: {{ conta.titular }} Saldo: {{ conta.saldo }} <input type="button" value="Reproduzir" (click)="reproduzir(conta._metadata.instance_id)"/>
       </li>
     </ul>
 
@@ -52,6 +52,7 @@
     <ul>
       <li *ngFor="let operacao of operacoes">
         <Transferência: De {{ operacao.contaOrigem }} para {{ operacao.contaDestino}}, Valor: {{ operacao.valorTransferencia }}>
+        <input type="button" value="Reproduzir" (click)="reproduzir(operacao._metadata.instance_id)"/>
       </li>
     </ul>
 

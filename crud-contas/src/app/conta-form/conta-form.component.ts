@@ -16,7 +16,7 @@ export class ContaFormComponent implements OnInit {
 
   contas: Conta[] = [];
   clientes: Cliente[] = [];
-  model = new Conta(0, '', 0);
+  model = new Conta(0, '', 0, null);
   valorDaTransferencia: number;
   contaOrigem: Conta;
   contaDestino: Conta;
@@ -50,18 +50,23 @@ export class ContaFormComponent implements OnInit {
 
   // TODO: Verifica se o evento é esperado pela camada de apresentação.
   eventDone(evt) {
+    alert(evt.name);
     if (evt.name === 'account.saved') {
       if (evt.reproducao) {
-        alert('Reprocessamento do cadastro da conta realizado!');
+        alert('Reprodução do cadastro da conta realizada!');
       } else {
         alert('Conta Confirmada!');
         evt.payload.instanciaOriginal = evt.instancia;
         this.consultaListaCompletaDeContas();
       }
     } else if (evt.name === 'transfer.confirmation') {
-      this.consultaListaCompletaDeContas();
-      this.consultaListaCompletaDeTransferencias();
-      alert('Transferência realizada com sucesso!');
+      if (evt.reproducao) {
+        alert('Reprodução da transferência realizada!');
+      } else {
+        this.consultaListaCompletaDeContas();
+        this.consultaListaCompletaDeTransferencias();
+        alert('Transferência realizada com sucesso!');
+      }
     }
   }
 
@@ -88,7 +93,7 @@ export class ContaFormComponent implements OnInit {
 
   onSubmit(form: Conta): void {
 
-    const conta = new Conta(this.contas.length, form.titular, Number(form.saldo));
+    const conta = new Conta(this.contas.length, form.titular, Number(form.saldo), null);
 
     const presentationId = this.presentationId;
 
@@ -111,7 +116,8 @@ export class ContaFormComponent implements OnInit {
       this.operacoes.length,
       this.contaOrigem,
       this.contaDestino,
-      Number(this.valorDaTransferencia)
+      Number(this.valorDaTransferencia),
+      null
     );
 
     const url = environment.urlServerPresentation + 'transfer';
