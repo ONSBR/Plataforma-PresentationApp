@@ -50,7 +50,6 @@ export class ContaFormComponent implements OnInit {
 
   // TODO: Verifica se o evento é esperado pela camada de apresentação.
   eventDone(evt) {
-    alert(evt.name);
     if (evt.name === 'account.saved') {
       if (evt.reproducao) {
         alert('Reprodução do cadastro da conta realizada!');
