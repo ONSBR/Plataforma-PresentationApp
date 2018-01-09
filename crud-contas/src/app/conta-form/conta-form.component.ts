@@ -71,14 +71,14 @@ export class ContaFormComponent implements OnInit {
 
   consultaListaCompletaDeContas() {
     const headers = new HttpHeaders().set('Instance-Id', this.presentationId);
-    this.http.get('http://localhost:9090/presentation-conta/conta', {headers}).subscribe(data => {
+    this.http.get(environment.urlDomainAppConta, {headers}).subscribe(data => {
       this.contas = <Conta[]> data;
     });
   }
 
   consultaListaCompletaDeTransferencias() {
     const headers = new HttpHeaders().set('Instance-Id', this.presentationId);
-    this.http.get('http://localhost:9090/presentation-conta/transferencia', {headers}).subscribe(data => {
+    this.http.get(environment.urlDomainAppTransferencia, {headers}).subscribe(data => {
       this.operacoes = <Operacao[]> data;
     });
   }
@@ -103,13 +103,10 @@ export class ContaFormComponent implements OnInit {
       console.log('url: ' + url + ', res: ' + data);
     });
 
-    console.log(this.contas);
   }
 
   transferir(event): void {
     event.preventDefault();
-
-    console.log(this.contaOrigem.id);
 
     const operacao = new Operacao(
       this.operacoes.length,
