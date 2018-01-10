@@ -1,7 +1,6 @@
 import { Component, OnInit, Inject } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Conta, Operacao } from '../Conta.model';
-import { Cliente } from '../Cliente.model';
 import { environment } from '../../environments/environment.prod';
 
 @Component({
@@ -15,7 +14,6 @@ export class ContaFormComponent implements OnInit {
   private presentationId: string = Guid.newGuid();
 
   contas: Conta[] = [];
-  clientes: Cliente[] = [];
   model = new Conta(0, '', 0, null);
   valorDaTransferencia: number;
   contaOrigem: Conta;
