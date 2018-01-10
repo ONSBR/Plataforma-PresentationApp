@@ -1,7 +1,6 @@
 import { Component, OnInit, Inject } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Conta, Operacao } from '../Conta.model';
-import { Cliente } from '../Cliente.model';
 import { environment } from '../../environments/environment.prod';
 
 @Component({
@@ -15,7 +14,6 @@ export class ContaFormComponent implements OnInit {
   private presentationId: string = Guid.newGuid();
 
   contas: Conta[] = [];
-  clientes: Cliente[] = [];
   model = new Conta(0, '', 0, null);
   valorDaTransferencia: number;
   contaOrigem: Conta;
@@ -58,21 +56,19 @@ export class ContaFormComponent implements OnInit {
 
     var equalsContent = contentFrom == contentTo;
 
-    tagResult.textContent = "";
-
     if (equalsContent) {
-      titleCompara.textContent = "As memórias da reprodução são iguais.";
-      tagFrom.textContent = "";
-      tagTo.textContent = "";
+      titleCompara.innerHTML = "<b><font color='blue'>As memórias da reprodução são iguais.</font></b>";
     } else {
       titleCompara.innerHTML = "<b><font color='red'>As memórias da reprodução são diferentes.</font></b>";
-
-      var result = (<any>window).compareText("diffChars", contentFrom, contentTo);
-      
-      tagFrom.textContent = contentFrom;
-      tagTo.textContent = contentTo;
-      tagResult.appendChild(result);
     }
+
+    var result = (<any>window).compareText("diffChars", contentFrom, contentTo);
+    
+    tagFrom.textContent = contentFrom;
+    tagTo.textContent = contentTo;
+    
+    tagResult.textContent = "";
+    tagResult.appendChild(result);
   }
 
   // TODO: Verifica se o evento é esperado pela camada de apresentação.
@@ -83,12 +79,11 @@ export class ContaFormComponent implements OnInit {
         this.reproducoesIds.push(evt.reproducao);
       } else {
         alert('Conta Confirmada!');
-        this.consultaListaCompletaDeContas();
-        /* TODO para funcionar offline
+        //this.consultaListaCompletaDeContas();
+        // TODO para funcionar offline
         evt.payload._metadata = {};
         evt.payload._metadata.instance_id = evt.instancia
         this.contas.push(evt.payload);
-        */
       }
     } else if (evt.name === 'transfer.confirmation') {
       if (evt.reproducao) {
@@ -121,11 +116,50 @@ export class ContaFormComponent implements OnInit {
       
       var dynData = <any>data;
       
+      this.prepareMemoryToCompare(dynData.memoriaProcessoOriginal);
+      this.prepareMemoryToCompare(dynData.memoriaProcessoReproducao);
+
       this.compareText(
         JSON.stringify(dynData.memoriaProcessoOriginal, null, "\t"), 
         JSON.stringify(dynData.memoriaProcessoReproducao, null, "\t")
       );
     });
+  }
+  
+  prepareMemoryToCompare(objMemory) {
+    
+    if (objMemory instanceof Array) {
+        for(var i = 0; i < objMemory.length; i++) {
+          var item = objMemory[i];
+          this.prepareMemoryToCompare(item); 
+        }
+        return;
+    }
+
+    if (objMemory.evento) {
+      var evento = objMemory.evento;
+      delete evento.reproducao;
+      delete evento.dataDoEvento;
+      delete evento.origem;
+      delete evento.instancia;
+    } else {
+      delete objMemory.evento;
+    }
+    
+    if (objMemory.eventoSaida) {
+      var eventoSaida = objMemory.eventoSaida;
+      delete eventoSaida.reproducao;
+      delete eventoSaida.dataDoEvento;
+      delete eventoSaida.origem;
+      delete eventoSaida.instancia;
+    } else {
+      delete objMemory.eventoSaida;
+    }
+    
+    delete objMemory.instancia;
+    delete objMemory.id;
+    delete objMemory.timestamp;
+
   }
 
   reproduzir(instanciaOriginal) {
