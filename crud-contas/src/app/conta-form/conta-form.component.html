@@ -19,7 +19,14 @@
     <h1>Lista de contas</h1>
     <ul>
       <li *ngFor="let conta of contas">
-        Titular: {{ conta.titular }} Saldo: {{ conta.saldo }} <input type="button" value="Reproduzir" (click)="reproduzir(conta.instanciaOriginal)"/>
+        Titular: {{ conta.titular }} Saldo: {{ conta.saldo }} <input type="button" value="Reproduzir" (click)="reproduzir(conta._metadata.instance_id)"/>
+      </li>
+    </ul>
+
+    <h1>Lista de Reproduções</h1>
+    <ul>
+      <li *ngFor="let reproducaoId of reproducoesIds">
+        Reprodução: {{ reproducaoId }} <input type="button" value="Comparar Memórias" (click)="compararResultadoReproducao(reproducaoId)"/>
       </li>
     </ul>
 
@@ -27,16 +34,16 @@
     <div class="form-group">
       <label for="contaOrigem">Conta origem</label>
       <select [(ngModel)]="contaOrigem" name="contaOrigem">
-        <option *ngFor="let conta of contas" [value]="conta.id">
-            {{ conta.id }}-{{ conta.titular }}
+        <option *ngFor="let conta of contas" [ngValue]="conta">
+            {{ conta.titular }}
         </option>
       </select>
     </div>
     <div class="form-group">
       <label for="contaDestino">Conta destino</label>
       <select [(ngModel)]="contaDestino" name="contaDestino">
-        <option *ngFor="let conta of contas" [value]="conta.id">
-            {{ conta.id }}-{{ conta.titular }}
+        <option *ngFor="let conta of contas" [ngValue]="conta">
+            {{ conta.titular }} 
         </option>
       </select>
     </div>
@@ -51,9 +58,27 @@
     <h1>Lista de Operações</h1>
     <ul>
       <li *ngFor="let operacao of operacoes">
-        Transferência: De {{ getConta(operacao.idContaOrigem).titular }} para {{ getConta(operacao.idContaDestino).titular }}, Valor: {{ operacao.valorTransferencia }}
+        <Transferência: De {{ operacao.contaOrigem }} para {{ operacao.contaDestino}}, Valor: {{ operacao.valorTransferencia }}>
+        <input type="button" value="Reproduzir" (click)="reproduzir(operacao._metadata.instance_id)"/>
       </li>
-    </ul>
+    </ul> 
+
+    <h1>Compara Reprodução</h1>
+    <!-- Comparação -->
+    <table>
+      <tr>
+        <td id="titleCompara" colspan="3"></td>
+      </tr>
+      <tr>
+        <td contenteditable="true" id="contentFrom"></td>
+        <td contenteditable="true" id="contentTo"></td>
+        <td><pre id="result"></pre></td>
+      </tr>
+    </table>
 
   </form>
 </div>
+
+
+
+

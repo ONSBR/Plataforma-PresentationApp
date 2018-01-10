@@ -8,8 +8,45 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <link rel="icon" type="image/x-icon" href="favicon.ico">
   <link rel="stylesheet" href="https://unpkg.com/bootstrap@3.3.7/dist/css/bootstrap.min.css">
+  <script src="http://incaseofstairs.com/jsdiff/diff.js"></script>
 </head>
 <body>
   <app-root></app-root>
 </body>
+
+<script defer>
+  
+  function compareText(diffType, contentFrom, contentTo) {
+    
+    var diff = JsDiff[diffType](contentFrom, contentTo);
+    var fragment = document.createDocumentFragment();
+    
+    for (var i=0; i < diff.length; i++) {
+  
+      if (diff[i].added && diff[i + 1] && diff[i + 1].removed) {
+        var swap = diff[i];
+        diff[i] = diff[i + 1];
+        diff[i + 1] = swap;
+      }
+  
+      var node;
+      if (diff[i].removed) {
+        node = document.createElement('del');
+        node.appendChild(document.createTextNode(diff[i].value));
+      } else if (diff[i].added) {
+        node = document.createElement('ins');
+        node.appendChild(document.createTextNode(diff[i].value));
+      } else {
+        node = document.createTextNode(diff[i].value);
+      }
+      fragment.appendChild(node);
+    }
+  
+    return fragment;
+  }
+
+  window.compareText = compareText;
+
+</script>
+  
 </html>

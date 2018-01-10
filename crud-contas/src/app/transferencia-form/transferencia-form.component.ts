@@ -11,14 +11,14 @@ import { environment } from '../../environments/environment';
 })
 
 export class TransferenciaFormComponent implements OnInit {
-  
+
   private presentationId: string = Guid.newGuid();
 
   contas: Conta[] = [];
-  model = new Conta(0, "", 0);
+  model = new Conta(0, '', 0, null);
   valorDaTransferencia: number;
-  contaOrigem: number;
-  contaDestino: number;
+  contaOrigem: string;
+  contaDestino: string;
 
   operacoes: Operacao[] = [];
 
@@ -61,7 +61,7 @@ export class TransferenciaFormComponent implements OnInit {
 
   onSubmit(form: Conta): void {  
 
-    var conta = new Conta(this.contas.length, form.titular, Number(form.saldo));
+    var conta = new Conta(this.contas.length, form.titular, Number(form.saldo), null);
     
     var presentationId = this.presentationId;
 
@@ -75,21 +75,20 @@ export class TransferenciaFormComponent implements OnInit {
     console.log(this.contas);
   }
 
-  transferir(event): void {  
-    
-    event.preventDefault();
+  transferir(event): void {
+    // event.preventDefault();
 
-    var operacao = new Operacao(
-      this.operacoes.length,
-      this.contaOrigem, 
-      this.contaDestino, 
-      Number(this.valorDaTransferencia)
-    );
+    // var operacao = new Operacao(
+    //   this.operacoes.length,
+    //   null,
+    //   null,
+    //   Number(this.valorDaTransferencia)
+    // );
 
-    this.contas[operacao.idContaOrigem].saldo = this.contas[operacao.idContaOrigem].saldo - operacao.valorTransferencia;
-    this.contas[operacao.idContaDestino].saldo = this.contas[operacao.idContaDestino].saldo + operacao.valorTransferencia;
+    // this.contas[operacao.idContaOrigem].saldo = this.contas[operacao.idContaOrigem].saldo - operacao.valorTransferencia;
+    // this.contas[operacao.idContaDestino].saldo = this.contas[operacao.idContaDestino].saldo + operacao.valorTransferencia;
 
-    this.operacoes.push(operacao);
+    // this.operacoes.push(operacao);
   }
 
 }

@@ -2,6 +2,7 @@ var config = require('./config');
 var eventHelper = require("plataforma-sdk/EventHelper");
 var Evento = require("plataforma-core/Evento");
 var EventCatalog = require("plataforma-processapp/conta-process-app/metadados/EventCatalog");
+var ClientEventCatalog = require("plataforma-processapp/cliente-process-app/metadados/EventCatalog");
 
 
 // Dependencies
@@ -61,7 +62,6 @@ app.put("/account", function(req, res) {
   res.send("OK");
 });
 
-
 app.put("/transfer", function(req, res) {
   
     console.log("___ENTER PUT TRANSFERENCIA___" + req.body.presentationId); 
@@ -96,6 +96,24 @@ app.put("/transfer", function(req, res) {
   
     res.send("OK");
   });
+
+  app.put("/client", function(req, res) {
+    
+      console.log("___ENTER PUT CLIENT___" + req.body.presentationId); 
+    
+      var presentationId = req.body.presentationId;
+      var cliente = req.body.cliente;
+    
+      var evento = new Evento();
+      evento.processName = "cadastra-cliente";
+      evento.name = ClientEventCatalog.client_put;
+      evento.payload = cliente;
+      evento.origem = presentationId;
+    
+      eventHelper.sendEvent(evento);
+    
+      res.send("OK");
+    });
 
 
 // Listener

@@ -1,7 +1,7 @@
 import { Component, OnInit, Inject } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
-
 import { Conta, Operacao } from '../Conta.model';
+import { Cliente } from '../Cliente.model';
 import { environment } from '../../environments/environment.prod';
 
 @Component({
@@ -11,35 +11,37 @@ import { environment } from '../../environments/environment.prod';
 })
 
 export class ContaFormComponent implements OnInit {
-  
+
   private presentationId: string = Guid.newGuid();
 
   contas: Conta[] = [];
-  model = new Conta(0, "", 0);
+  clientes: Cliente[] = [];
+  model = new Conta(0, '', 0, null);
   valorDaTransferencia: number;
-  contaOrigem: number;
-  contaDestino: number;
+  contaOrigem: Conta;
+  contaDestino: Conta;
+  reproducoesIds: string[] = [];
 
   operacoes: Operacao[] = [];
 
   constructor(private http: HttpClient) {
+    this.consultaListaCompletaDeContas();
+    this.consultaListaCompletaDeTransferencias();
   }
 
   ngOnInit() {
 
-      //TODO Pooling para realizar o papel do websocket, para receber mensagem para o client.
-      var self = this;
-      setInterval(() => { 
-        var urlEvt = environment.urlEventManager + self.presentationId;
-        
-        self.http.get(urlEvt, {responseType: "json", withCredentials:false}).subscribe(data => {
-          
-          var listaEventos: any = data;
+      // TODO Pooling para realizar o papel do websocket, para receber mensagem para o client.
+      const self = this;
+      setInterval(() => {
+        const urlEvt = environment.urlEventManager + self.presentationId;
+        self.http.get(urlEvt, {responseType: 'json', withCredentials: false}).subscribe(data => {
+
+          const listaEventos: any = data;
           if (listaEventos && listaEventos.length > 0) {
-            
-            for(var i=0; i<listaEventos.length; i++){
-              var evt = listaEventos[i];
-              self.doneEvent(evt);
+            for (let i = 0; i < listaEventos.length; i++) {
+              const evt = listaEventos[i];
+              self.eventDone(evt);
             }
           }
         });
@@ -47,79 +49,128 @@ export class ContaFormComponent implements OnInit {
 
   }
 
-  // TODO: Verifica se o evento é esperado pela camada de apresentação.
-  doneEvent(evt) {
-    
-    if(evt.name == "account.saved") {
+  compareText(contentFrom: string, contentTo: string) {
 
-      if (evt.reproducao) {
-        alert("Reprocessamento do cadastro da conta realizado!");
-      } else {
-        alert("Conta Confirmada!");
-        evt.payload.instanciaOriginal = evt.instancia;
-        this.contas.push(evt.payload);
-      }
-    }
-    else if(evt.name == "transfer.confirmation") {
-            
-      this.contas[evt.payload.contaOrigem.id] = evt.payload.contaOrigem;
-      this.contas[evt.payload.contaDestino.id] = evt.payload.contaDestino;
-      this.operacoes.push(evt.payload.operacao);
+    var titleCompara = document.getElementById('titleCompara');
+    var tagFrom = document.getElementById('contentFrom');
+    var tagTo = document.getElementById('contentTo');
+    var tagResult = document.getElementById('result');
+
+    var equalsContent = contentFrom == contentTo;
+
+    tagResult.textContent = "";
+
+    if (equalsContent) {
+      titleCompara.textContent = "As memórias da reprodução são iguais.";
+      tagFrom.textContent = "";
+      tagTo.textContent = "";
+    } else {
+      titleCompara.innerHTML = "<b><font color='red'>As memórias da reprodução são diferentes.</font></b>";
+
+      var result = (<any>window).compareText("diffChars", contentFrom, contentTo);
       
-      alert("Transferência realizada com sucesso!");
+      tagFrom.textContent = contentFrom;
+      tagTo.textContent = contentTo;
+      tagResult.appendChild(result);
     }
   }
 
-  reproduzir(instanciaOriginal) {
+  // TODO: Verifica se o evento é esperado pela camada de apresentação.
+  eventDone(evt) {
+    if (evt.name === 'account.saved') {
+      if (evt.reproducao) {
+        alert('Reprodução do cadastro da conta realizada!' + evt.reproducao);
+        this.reproducoesIds.push(evt.reproducao);
+      } else {
+        alert('Conta Confirmada!');
+        this.consultaListaCompletaDeContas();
+        /* TODO para funcionar offline
+        evt.payload._metadata = {};
+        evt.payload._metadata.instance_id = evt.instancia
+        this.contas.push(evt.payload);
+        */
+      }
+    } else if (evt.name === 'transfer.confirmation') {
+      if (evt.reproducao) {
+        alert('Reprodução da transferência realizada!');
+      } else {
+        this.consultaListaCompletaDeContas();
+        this.consultaListaCompletaDeTransferencias();
+        alert('Transferência realizada com sucesso!');
+      }
+    }
+  }
 
-    var url = environment.urlServerPresentation + "reproductionconta";
-
-    this.http.put(url, { instanciaOriginal: instanciaOriginal }, {responseType: "json", withCredentials:false}).subscribe(data => {
-      console.log("url: " + url + ", res: " + data);
+  consultaListaCompletaDeContas() {
+    const headers = new HttpHeaders().set('Instance-Id', this.presentationId);
+    this.http.get('http://localhost:9090/presentation-conta/conta', {headers}).subscribe(data => {
+      this.contas = <Conta[]> data;
     });
   }
 
-  getConta(idConta): Conta {
-    return this.contas[idConta];
+  consultaListaCompletaDeTransferencias() {
+    const headers = new HttpHeaders().set('Instance-Id', this.presentationId);
+    this.http.get('http://localhost:9090/presentation-conta/transferencia', {headers}).subscribe(data => {
+      this.operacoes = <Operacao[]> data;
+    });
   }
 
-  onSubmit(form: Conta): void {  
-
-    var conta = new Conta(this.contas.length, form.titular, Number(form.saldo));
-    
-    var presentationId = this.presentationId;
-
-    var url = environment.urlServerPresentation + "account";
-
-    this.http.put(url, { presentationId: presentationId, conta: conta }, {responseType: "json", withCredentials:false}).subscribe(data => {
+  compararResultadoReproducao(reproducaoId) {
+    const url = "http://localhost:8085/comparereproduction/" + reproducaoId;
+    this.http.get(url, {responseType: 'json', withCredentials: false}).subscribe(data => {
       
-      console.log("url: " + url + ", res: " + data);
+      var dynData = <any>data;
+      
+      this.compareText(
+        JSON.stringify(dynData.memoriaProcessoOriginal, null, "\t"), 
+        JSON.stringify(dynData.memoriaProcessoReproducao, null, "\t")
+      );
+    });
+  }
+
+  reproduzir(instanciaOriginal) {
+    const url = environment.urlServerPresentation + 'reproductionconta';
+    this.http.put(url, { instanciaOriginal: instanciaOriginal }, {responseType: 'json', withCredentials: false}).subscribe(data => {
+      console.log('url: ' + url + ', res: ' + data);
+    });
+  }
+
+  onSubmit(form: Conta): void {
+
+    const conta = new Conta(this.contas.length, form.titular, Number(form.saldo), null);
+
+    const presentationId = this.presentationId;
+
+    const url = environment.urlServerPresentation + 'account';
+
+    this.http.put(url, { presentationId: presentationId, conta: conta }, {responseType: 'json', withCredentials: false}).subscribe(data => {
+
+      console.log('url: ' + url + ', res: ' + data);
     });
 
     console.log(this.contas);
   }
 
-  transferir(event): void {  
+  transferir(event): void {
     event.preventDefault();
 
-    var operacao = new Operacao(
+    console.log(this.contaOrigem.id);
+
+    const operacao = new Operacao(
       this.operacoes.length,
-      this.contaOrigem, 
-      this.contaDestino, 
-      Number(this.valorDaTransferencia)
+      this.contaOrigem,
+      this.contaDestino,
+      Number(this.valorDaTransferencia),
+      null
     );
 
-    var contaOrigem = this.contas[operacao.idContaOrigem];
-    var contaDestino = this.contas[operacao.idContaDestino];
+    const url = environment.urlServerPresentation + 'transfer';
 
-    var url = environment.urlServerPresentation + "transfer";
+    const presentationId = this.presentationId;
 
-    var presentationId = this.presentationId;    
-
-    this.http.put(url, { presentationId: presentationId, contaOrigem: contaOrigem, contaDestino: contaDestino, operacao: operacao }, 
-      {responseType: "json", withCredentials:false}).subscribe(data => {
-      
-      console.log("url: " + url + ", res: " + data);
+    this.http.put(url, { presentationId: presentationId, operacao: operacao },
+          {responseType: 'json', withCredentials: false}).subscribe(data => {
+      console.log('url: ' + url + ', res: ' + data);
     });
 
   }
