@@ -4,6 +4,9 @@ var Evento = require("plataforma-core/Evento");
 var EventCatalog = require("plataforma-processapp/conta-process-app/metadados/EventCatalog");
 var ClientEventCatalog = require("plataforma-processapp/cliente-process-app/metadados/EventCatalog");
 
+var CoreRepository = require("plataforma-sdk/services/CoreRepository");
+var Client = require('node-rest-client').Client;
+
 
 // Dependencies
 // ===========================================================
@@ -14,6 +17,8 @@ var bodyParser = require("body-parser");
 // ===========================================================
 var app = express();
 var PORT = config.PORT;
+
+var coreRepository = new CoreRepository();
 
 // Set up the Express application to handle data parsing
 app.use(bodyParser.urlencoded({ extended: false }));
@@ -95,6 +100,50 @@ app.put("/transfer", function(req, res) {
     eventHelper.sendEvent(evento);
   
     res.send("OK");
+  });
+
+  app.get("/comparereproduction/:reproductionId", function(req, res) {
+    
+    var reproductionId = req.params.reproductionId;
+
+    console.log("___ENTER PUT REPRODUCTION___" + reproductionId); 
+
+    var reproducao = coreRepository.getReproduction(reproductionId);
+
+    var processInstance = coreRepository.getProcessInstance(reproducao.instanciaOriginal);
+
+    var args = { headers: { "Content-Type": "application/json" } };
+
+    var urlGetProcessMemoryOriginal = config.processMemoryUrl + processInstance.processo + "/" + reproducao.instanciaOriginal + "/history";
+    var client = new Client();
+  
+    var memoriasOriginal = null;
+
+    var reqMemoriasOriginal = client.get(urlGetProcessMemoryOriginal, function (data, response) {
+      
+        var memoriasOriginal = data;
+
+        var urlGetProcessMemoryReproc = config.processMemoryUrl + processInstance.processo + "/" + reproducao.instanciaReproducao + "/history";
+        
+        var reqMemoriasReproc = client.get(urlGetProcessMemoryReproc, function (data, response) {
+            
+            var memoriasReproc = data;
+            
+            var retorno = { memoriaProcessoOriginal: memoriasOriginal, memoriaProcessoReproducao: memoriasReproc};
+            retorno.jsonMemoryOrigem
+        
+            res.send(retorno);
+
+        });
+        reqMemoriasReproc.on('error', function (err) {
+            console.log('request error', err);
+        });
+
+    });
+    reqMemoriasOriginal.on('error', function (err) {
+        console.log('request error', err);
+    });
+
   });
 
   app.put("/client", function(req, res) {
