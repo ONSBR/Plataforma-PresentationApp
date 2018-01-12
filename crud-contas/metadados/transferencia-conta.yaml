@@ -1,0 +1,26 @@
+Transferencia:
+  model: tb_operation
+  fields:
+    contaOrigem:
+      column: acc_origin
+      required: true
+    contaDestino:
+      column: acc_dest      
+      required: true
+    valorTransferencia:
+      column: transfer_vl      
+      required: true
+    tipoOperacao:
+      column: tp_operation
+      required: true
+
+Conta:
+  model: tb_account
+  fields:
+    saldo:
+      column: vl_balance
+    titular:
+      column: nm_titular
+  filters:
+    byId:
+      id: :id
