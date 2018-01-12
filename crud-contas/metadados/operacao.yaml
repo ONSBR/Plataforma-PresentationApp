@@ -1,0 +1,7 @@
+operacao: 
+  - operacoes: 
+      nome: account.saved
+      metodo: account.saved
+      eventos-entrada:
+        -account.saved
+      eventos-saida:
